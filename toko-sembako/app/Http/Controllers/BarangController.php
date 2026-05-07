@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\DB;
 class BarangController extends Controller
 {
     public function index(Request $r){
-        if(!session('login')){
-            return redirect('/login');
-        }
+        // if(!session('login')){
+        //     return redirect('/login');
+        // }
 
         if($r->cari){
             $data = DB::table('barang')

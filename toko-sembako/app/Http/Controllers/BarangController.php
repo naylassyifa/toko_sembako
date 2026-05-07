@@ -39,7 +39,7 @@ class BarangController extends Controller
             'satuan'=>$r->satuan
         ]);
 
-        return redirect('/?pesan=berhasil');
+        return redirect('/barang?pesan=berhasil');
     }
 
     public function edit($id){
@@ -57,11 +57,18 @@ class BarangController extends Controller
             'satuan'=>$r->satuan
         ]);
 
-        return redirect('/?pesan=update');
+        return redirect('/barang?pesan=update');
     }
 
     public function delete($id){
         DB::table('barang')->where('id_barang',$id)->delete();
         return redirect('/?pesan=hapus');
     }
+    public function apiBarang()
+{
+    $data = DB::table('barang')->get();
+
+    return response()->json($data, 200, [], JSON_PRETTY_PRINT);
+}
+
 }

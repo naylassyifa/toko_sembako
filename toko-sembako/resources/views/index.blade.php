@@ -8,7 +8,7 @@
 <body>
 
 <div class="navbar">
-    <h1>Toko Sembako</h1>
+    <h1>MATARAM STORE</h1>
     <p>Manajemen Data Barang</p>
 </div>
 

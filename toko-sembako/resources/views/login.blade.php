@@ -3,18 +3,16 @@
 <head>
     <title>Login</title>
 
-    <!-- WAJIB ADA INI -->
     <link rel="stylesheet" href="{{ asset('style.css') }}">
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header-login">
-    🛒 Aplikasi Toko Sembako Mataram - Login Admin
+     Aplikasi Toko Sembako Mataram - Login Admin
 </div>
 
-<!-- WRAPPER -->
+
 <div class="login-wrapper">
     <div class="login-box">
 

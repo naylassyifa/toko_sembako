@@ -14,7 +14,7 @@
 <div class="container">
 
 <div class="form-box">
-    <form method="POST" action="/tambah">
+    <form method="POST" action="{{ route('barang.store') }}">
         @csrf
 
         <label>Nama Barang</label>

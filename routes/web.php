@@ -23,3 +23,6 @@ Route::get('/transaksi', [TransaksiController::class,'index']);
 Route::post('/transaksi/tambah', [TransaksiController::class,'tambah']);
 Route::post('/transaksi/hapus', [TransaksiController::class,'hapus']);
 Route::post('/transaksi/checkout', [TransaksiController::class,'checkout']);
+Route::post('/tambah-keranjang/{id}', [TransaksiController::class, 'tambahKeranjang']);
+Route::get('/hapus-keranjang/{id}', [TransaksiController::class, 'hapusKeranjang']);
+Route::post('/checkout', [TransaksiController::class, 'checkout']);

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Transaksi</title>
+    <title>Kasir</title>
     <link rel="stylesheet" href="{{ asset('style.css') }}">
 </head>
+
 <body>
 
 <div class="navbar">
@@ -13,66 +14,116 @@
 
 <div class="container">
 
-<h2>Pilih Barang</h2>
+    <h2 class="judul-section">Pilih Barang</h2>
 
-<div class="dashboard">
-@foreach($barang as $b)
-    <div class="card">
-        <h4>{{ $b->nama_barang }}</h4>
-        <p>Rp {{ number_format($b->harga_jual) }}</p>
+    <div class="produk-grid">
 
-        <form method="POST" action="/transaksi/tambah">
-            @csrf
-            <input type="hidden" name="id" value="{{ $b->id_barang }}">
-            <button>+ Tambah</button>
-        </form>
+        @foreach($barang as $row)
+
+        <div class="produk-card">
+
+            <div class="produk-info">
+
+                <h3>{{ $row->nama_barang }}</h3>
+
+                <p class="harga">
+                    Rp {{ number_format($row->harga_jual,0,',','.') }}
+                </p>
+
+                <span class="stok">
+                    Stok: {{ $row->stok }}
+                </span>
+
+            </div>
+
+            <!-- BUTTON TAMBAH -->
+            <form action="/tambah-keranjang/{{ $row->id_barang }}" method="POST">
+                @csrf
+
+                <button type="submit" class="btn-tambah">
+                    + Tambah
+                </button>
+            </form>
+
+        </div>
+
+        @endforeach
+
     </div>
-@endforeach
-</div>
 
-<hr>
+    <!-- KERANJANG -->
+    <div class="keranjang-box">
 
-<h2>Keranjang</h2>
+        <h2 class="judul-section">Keranjang</h2>
 
-<table>
-<tr>
-<th>Nama</th>
-<th>Harga</th>
-<th>Qty</th>
-<th>Subtotal</th>
-<th>Aksi</th>
-</tr>
+        <table>
 
-@php $total = 0; @endphp
+            <tr>
+                <th>Nama</th>
+                <th>Harga</th>
+                <th>Qty</th>
+                <th>Subtotal</th>
+                <th>Aksi</th>
+            </tr>
 
-@foreach($cart as $id => $item)
-@php $sub = $item['harga'] * $item['qty']; $total += $sub; @endphp
+            @php $total = 0; @endphp
 
-<tr>
-<td>{{ $item['nama'] }}</td>
-<td>{{ $item['harga'] }}</td>
-<td>{{ $item['qty'] }}</td>
-<td>{{ $sub }}</td>
-<td>
-<form method="POST" action="/transaksi/hapus">
-@csrf
-<input type="hidden" name="id" value="{{ $id }}">
-<button>Hapus</button>
-</form>
-</td>
-</tr>
-@endforeach
+            @foreach($keranjang as $item)
 
-</table>
+            @php
+                $subtotal = $item['harga'] * $item['qty'];
+                $total += $subtotal;
+            @endphp
 
-<h3>Total: Rp {{ number_format($total) }}</h3>
+            <tr>
 
-<form method="POST" action="/transaksi/checkout">
-@csrf
-<button style="background:green;color:white;padding:10px;">
-Checkout
-</button>
-</form>
+                <td>{{ $item['nama'] }}</td>
+
+                <td>
+                    Rp {{ number_format($item['harga'],0,',','.') }}
+                </td>
+
+                <td>{{ $item['qty'] }}</td>
+
+                <td>
+                    Rp {{ number_format($subtotal,0,',','.') }}
+                </td>
+
+                <td>
+
+                    <!-- BUTTON HAPUS -->
+                    <a href="/hapus-keranjang/{{ $item['id'] }}"
+                    class="btn-hapus">
+                        Hapus
+                    </a>
+
+                </td>
+
+            </tr>
+
+            @endforeach
+
+        </table>
+
+        <!-- CHECKOUT -->
+        <div class="checkout-box">
+
+            <h2>
+                Total:
+                Rp {{ number_format($total,0,',','.') }}
+            </h2>
+
+            <form action="/checkout" method="POST">
+                @csrf
+
+                <button type="submit" class="btn-checkout">
+                    Checkout
+                </button>
+            </form>
+
+        </div>
+
+    </div>
 
 </div>
 

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kasir - Transaksi</title>
     <link rel="stylesheet" href="{{ asset('style.css') }}">
+    <link rel="stylesheet" href="{{ asset('extra-transaksi.css') }}">
 </head>
 
 <body>
@@ -65,7 +66,7 @@
                 @else
                     <div class="produk-image-placeholder">📦</div>
                 @endif
-                
+
                 @if($row->stok <= 0)
                     <div class="stock-out-badge">Stok Habis</div>
                 @elseif($row->stok < 5)
@@ -88,7 +89,6 @@
 
             </div>
 
-            <!-- BUTTON TAMBAH -->
             @if($row->stok > 0)
                 <form action="/tambah-keranjang/{{ $row->id_barang }}" method="POST" class="form-tambah">
                     @csrf
@@ -169,7 +169,8 @@
 
                             <td class="aksi-cell">
                                 <a href="/hapus-keranjang/{{ $item['id'] }}" class="btn-hapus-keranjang">
-                                    🗑️ Hapus
+                                    <span class="hapus-icon">🗑️</span>
+                                    <span class="hapus-text">Hapus</span>
                                 </a>
                             </td>
 
@@ -195,13 +196,13 @@
                     </div>
                 </div>
 
-                <form action="/checkout" method="POST" class="checkout-form">
-                    @csrf
-
-                    <button type="submit" class="btn-checkout-large">
-                        ✓ Checkout & Selesaikan Transaksi
-                    </button>
-                </form>
+                <button
+                    type="button"
+                    class="btn-checkout-large"
+                    onclick="showCheckoutModal()"
+                >
+                    ✓ Checkout & Selesaikan Transaksi
+                </button>
 
             </div>
 
@@ -219,13 +220,154 @@
 
 </div>
 
+
+
+
+
+<!-- CHECKOUT CONFIRMATION MODAL -->
+<div id="checkoutModal" class="modal modal-checkout">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <h2>🧾 Konfirmasi Checkout</h2>
+        </div>
+
+        <div class="modal-body">
+
+            <div class="checkout-warning">
+                📋 Periksa kembali daftar barang sebelum menyelesaikan transaksi
+            </div>
+
+            <!-- TABEL BARANG -->
+            <div class="checkout-item-table-wrapper">
+                <table class="checkout-item-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nama Barang</th>
+                            <th>Qty</th>
+                            <th>Harga</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="checkoutItemList">
+                        <!-- diisi oleh JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- RINGKASAN TOTAL -->
+            <div class="checkout-summary">
+                <div class="summary-row">
+                    <span class="summary-label">Total Item:</span>
+                    <span class="summary-value" id="checkoutItems">-</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span class="summary-label">💰 Total Harga:</span>
+                    <span class="summary-value" id="checkoutPrice">Rp 0</span>
+                </div>
+            </div>
+
+            <div class="checkout-info-note">
+                ✓ Stok akan berkurang otomatis setelah transaksi diselesaikan
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeCheckoutModal()">✕ Kembali</button>
+            <button class="btn-confirm-checkout" onclick="confirmCheckout()">✓ Selesaikan Transaksi</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- SEMUA SCRIPT DI SINI — setelah modal HTML agar getElementById tidak null -->
 <script>
-    // Auto-hide notifications after 5 seconds
-    document.querySelectorAll('.notification.show').forEach(notif => {
-        setTimeout(() => {
+    // ── Data dari server ──────────────────────────────────────────
+    @php
+        $keranjang_js   = [];
+        $total_js       = 0;
+        $total_items_js = 0;
+        foreach(session('cart', []) as $item) {
+            $sub             = $item['harga'] * $item['qty'];
+            $total_js       += $sub;
+            $total_items_js += $item['qty'];
+            $keranjang_js[]  = [
+                'nama'     => $item['nama'],
+                'qty'      => (int) $item['qty'],
+                'harga'    => (int) $item['harga'],
+                'subtotal' => (int) $sub,
+            ];
+        }
+    @endphp
+    const _keranjangData = {!! json_encode($keranjang_js, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!};
+    const _totalHarga    = {{ (int) $total_js }};
+    const _totalItems    = {{ (int) $total_items_js }};
+
+    // ── Helpers ───────────────────────────────────────────────────
+    function formatRupiah(angka) {
+        return 'Rp ' + Number(angka).toLocaleString('id-ID');
+    }
+
+    // ── Auto-hide notifications ───────────────────────────────────
+    document.querySelectorAll('.notification.show').forEach(function(notif) {
+        setTimeout(function() {
             notif.classList.remove('show');
-            setTimeout(() => notif.remove(), 300);
+            setTimeout(function() { notif.remove(); }, 300);
         }, 5000);
+    });
+
+    // ── Checkout modal ────────────────────────────────────────────
+    function showCheckoutModal() {
+        var modal        = document.getElementById('checkoutModal');
+        var itemsDisplay = document.getElementById('checkoutItems');
+        var priceDisplay = document.getElementById('checkoutPrice');
+        var itemListBody = document.getElementById('checkoutItemList');
+
+        if (!modal) { console.error('Modal tidak ditemukan'); return; }
+
+        itemsDisplay.textContent = _totalItems + ' item';
+        priceDisplay.textContent = formatRupiah(_totalHarga);
+
+        // Render baris barang
+        itemListBody.innerHTML = '';
+        _keranjangData.forEach(function(item, index) {
+            var tr = document.createElement('tr');
+            tr.className = 'modal-item-row';
+            tr.innerHTML =
+                '<td class="modal-item-no">' + (index + 1) + '</td>' +
+                '<td class="modal-item-nama"><span class="modal-item-icon">📦</span> ' + item.nama + '</td>' +
+                '<td class="modal-item-qty"><span class="modal-qty-badge">' + item.qty + 'x</span></td>' +
+                '<td class="modal-item-harga">' + formatRupiah(item.harga) + '</td>' +
+                '<td class="modal-item-subtotal">' + formatRupiah(item.subtotal) + '</td>';
+            itemListBody.appendChild(tr);
+        });
+
+        modal.classList.add('show');
+    }
+
+    function closeCheckoutModal() {
+        var modal = document.getElementById('checkoutModal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    function confirmCheckout() {
+        var form       = document.createElement('form');
+        form.method    = 'POST';
+        form.action    = '/checkout';
+        var csrf       = document.createElement('input');
+        csrf.type      = 'hidden';
+        csrf.name      = '_token';
+        csrf.value     = '{{ csrf_token() }}';
+        form.appendChild(csrf);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // Tutup modal kalau klik di luar area konten
+    document.getElementById('checkoutModal').addEventListener('click', function(e) {
+        if (e.target === this) closeCheckoutModal();
     });
 </script>
 

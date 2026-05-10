@@ -25,4 +25,5 @@ Route::post('/transaksi/hapus', [TransaksiController::class,'hapus']);
 Route::post('/transaksi/checkout', [TransaksiController::class,'checkout']);
 Route::post('/tambah-keranjang/{id}', [TransaksiController::class, 'tambahKeranjang']);
 Route::get('/hapus-keranjang/{id}', [TransaksiController::class, 'hapusKeranjang']);
+Route::get('/beli-sekarang/{id}', [TransaksiController::class, 'beliSekarang']);
 Route::post('/checkout', [TransaksiController::class, 'checkout']);

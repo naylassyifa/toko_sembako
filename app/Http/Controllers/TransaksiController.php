@@ -79,6 +79,40 @@ class TransaksiController extends Controller
         return redirect('/transaksi');
     }
 
+    public function beliSekarang($id)
+    {
+        // Tambahkan barang ke keranjang
+        $barang = DB::table('barang')
+                    ->where('id_barang', $id)
+                    ->first();
+
+        if(!$barang || $barang->stok <= 0) {
+            return redirect('/transaksi')->with('error', 'Stok barang tidak tersedia');
+        }
+
+        $keranjang = session()->get('cart', []);
+
+        if(isset($keranjang[$id])){
+            if($keranjang[$id]['qty'] >= $barang->stok) {
+                return redirect('/transaksi')->with('error', 'Qty melebihi stok yang tersedia untuk ' . $barang->nama_barang);
+            }
+            $keranjang[$id]['qty']++;
+        } else {
+            $keranjang[$id] = [
+                "id" => $barang->id_barang,
+                "nama" => $barang->nama_barang,
+                "harga" => $barang->harga_jual,
+                "qty" => 1,
+                "stok_available" => $barang->stok
+            ];
+        }
+
+        session()->put('cart', $keranjang);
+
+        // Langsung ke transaksi
+        return redirect('/transaksi')->with('success', $barang->nama_barang . ' ditambahkan ke keranjang');
+    }
+
     public function checkout()
     {
         $keranjang = session()->get('cart', []);

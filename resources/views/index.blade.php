@@ -150,7 +150,7 @@
                 <div class="product-actions">
                     <a class="btn-edit" href="/edit/{{ $row->id_barang }}">✏️ Edit</a>
                     <a class="btn-hapus" href="#" onclick="showDeleteModal('{{ $row->id_barang }}', '{{ $row->nama_barang }}'); return false;">🗑️ Hapus</a>
-                    <a class="btn-buy" href="/transaksi">🛍️ Beli</a>
+                    <a class="btn-buy" href="/beli-sekarang/{{ $row->id_barang }}">🛍️ Beli</a>
                 </div>
             </div>
         </div>

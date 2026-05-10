@@ -14,7 +14,7 @@
 <div class="container">
 
 <div class="form-box">
-    <form method="POST" action="/tambah">
+    <form method="POST" action="/tambah" enctype="multipart/form-data">
         @csrf
 
         <label>Nama Barang</label>
@@ -34,6 +34,10 @@
 
         <label>Satuan</label>
         <input type="text" name="satuan" required>
+
+        <label>Gambar Produk</label>
+        <input type="file" name="gambar" accept="image/*" class="input-file">
+        <small style="color: #666; margin-top: 5px; display: block;">Format: JPG, PNG, GIF (Max. 5MB)</small>
 
         <button class="btn-save">Simpan</button>
     </form>

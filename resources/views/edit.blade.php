@@ -14,7 +14,7 @@
 <div class="container">
 
 <div class="form-box">
-    <form method="POST" action="/edit">
+    <form method="POST" action="/edit" enctype="multipart/form-data">
         @csrf
 
         <input type="hidden" name="id" value="{{ $row->id_barang }}">
@@ -36,6 +36,16 @@
 
         <label>Satuan</label>
         <input name="satuan" value="{{ $row->satuan }}">
+
+        <label>Gambar Produk</label>
+        @if($row->gambar && file_exists(public_path($row->gambar)))
+            <div style="margin-bottom: 15px;">
+                <img src="{{ asset($row->gambar) }}" alt="{{ $row->nama_barang }}" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                <p style="margin-top: 10px; color: #666; font-size: 13px;">Gambar saat ini</p>
+            </div>
+        @endif
+        <input type="file" name="gambar" accept="image/*" class="input-file">
+        <small style="color: #666; margin-top: 5px; display: block;">Biarkan kosong jika tidak ingin mengubah gambar</small>
 
         <button class="btn-save">Update</button>
     </form>

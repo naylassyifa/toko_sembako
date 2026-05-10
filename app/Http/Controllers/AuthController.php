@@ -25,7 +25,7 @@ class AuthController extends Controller
             return redirect('/');
         }
 
-        return back();
+        return back()->withErrors(['login' => true]);
     }
 
     public function logout(){

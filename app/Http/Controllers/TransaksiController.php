@@ -35,10 +35,18 @@ class TransaksiController extends Controller
                     ->where('id_barang', $id)
                     ->first();
 
+        // Cek stok
+        if(!$barang || $barang->stok <= 0) {
+            return redirect('/transaksi')->with('error', 'Stok barang tidak tersedia');
+        }
+
         $keranjang = session()->get('cart', []);
 
         if(isset($keranjang[$id])){
-
+            // Cek apakah qty sudah melebihi stok
+            if($keranjang[$id]['qty'] >= $barang->stok) {
+                return redirect('/transaksi')->with('error', 'Qty melebihi stok yang tersedia untuk ' . $barang->nama_barang);
+            }
             $keranjang[$id]['qty']++;
 
         } else {
@@ -47,13 +55,14 @@ class TransaksiController extends Controller
                 "id" => $barang->id_barang,
                 "nama" => $barang->nama_barang,
                 "harga" => $barang->harga_jual,
-                "qty" => 1
+                "qty" => 1,
+                "stok_available" => $barang->stok
             ];
         }
 
         session()->put('cart', $keranjang);
 
-        return redirect('/transaksi');
+        return redirect('/transaksi')->with('success', $barang->nama_barang . ' ditambahkan ke keranjang');
     }
 
     public function hapusKeranjang($id)
@@ -72,9 +81,45 @@ class TransaksiController extends Controller
 
     public function checkout()
     {
-        session()->forget('cart');
+        $keranjang = session()->get('cart', []);
 
-        return redirect('/transaksi')
-            ->with('success', 'Checkout berhasil');
+        if(empty($keranjang)){
+            return redirect('/transaksi')->with('error', 'Keranjang kosong');
+        }
+
+        $total = 0;
+        $total_items = 0;
+
+        DB::beginTransaction();
+        try {
+            foreach($keranjang as $id => $item){
+                $barang = DB::table('barang')->where('id_barang', $id)->lockForUpdate()->first();
+
+                if(!$barang || $barang->stok < $item['qty']){
+                    DB::rollBack();
+                    return redirect('/transaksi')->with('error', 'Stok tidak cukup untuk ' . $item['nama']);
+                }
+
+                // Kurangi stok
+                DB::table('barang')->where('id_barang', $id)->update([
+                    'stok' => $barang->stok - $item['qty']
+                ]);
+
+                $subtotal = $item['harga'] * $item['qty'];
+                $total += $subtotal;
+                $total_items += $item['qty'];
+            }
+
+            DB::commit();
+
+            // Kosongkan keranjang setelah sukses
+            session()->forget('cart');
+
+            return redirect('/transaksi')->with('success', 'Checkout berhasil. Total item: ' . $total_items . '. Total harga: Rp ' . number_format($total,0,',','.'));
+
+        } catch(\Exception $e){
+            DB::rollBack();
+            return redirect('/transaksi')->with('error', 'Terjadi kesalahan saat checkout');
+        }
     }
 }

@@ -1,0 +1,134 @@
+/* Transaksi specific styles */
+.produk-grid-transaksi{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:18px;
+    margin-bottom:30px;
+}
+
+.produk-card-transaksi{
+    background:white;
+    border-radius:12px;
+    padding:14px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.06);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    align-items:center;
+}
+
+.produk-image-section{
+    width:100%;
+    height:140px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+    border-radius:8px;
+    background:#f3f4f6;
+}
+
+.produk-image{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.produk-image-placeholder{
+    font-size:40px;
+    color:#9ca3af;
+}
+
+.stock-out-badge{
+    position:absolute;
+    left:10px;
+    top:10px;
+    background:#ef4444;
+    color:white;
+    padding:6px 10px;
+    border-radius:8px;
+    font-weight:700;
+}
+
+.stock-warning-badge{
+    position:absolute;
+    left:10px;
+    top:10px;
+    background:#f59e0b;
+    color:white;
+    padding:6px 10px;
+    border-radius:8px;
+    font-weight:700;
+}
+
+.produk-info-transaksi{
+    text-align:center;
+}
+
+.kategori-tag{
+    display:inline-block;
+    background:#eef2ff;
+    color:#3730a3;
+    padding:4px 10px;
+    border-radius:999px;
+    font-weight:700;
+    margin-right:8px;
+}
+
+.stok-info{color:#6b7280}
+
+.btn-tambah-produk{
+    width:100%;
+    border:none;
+    padding:10px 14px;
+    border-radius:10px;
+    background:linear-gradient(135deg,#10b981,#059669);
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.btn-tambah-produk.disabled{background:#d1d5db;color:#6b7280}
+
+.keranjang-section{
+    margin-top:30px;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.06);
+}
+
+.keranjang-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.item-count{
+    background:#f3f4f6;
+    padding:6px 10px;
+    border-radius:999px;
+    font-weight:700;
+}
+
+.keranjang-table{width:100%;border-collapse:collapse}
+.keranjang-table th{background:#f8fafc;padding:10px;text-align:left}
+.keranjang-table td{padding:10px;border-top:1px solid #eef2ff}
+
+.qty-badge{background:#f3f4f6;padding:4px 8px;border-radius:6px;font-weight:700}
+
+.checkout-section{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+.checkout-stats{display:flex;gap:20px;flex-wrap:wrap}
+.stat-item{background:#f8fafc;padding:12px;border-radius:8px}
+.stat-label{color:#6b7280;font-weight:700}
+.stat-value{font-weight:800;font-size:18px}
+
+.btn-checkout-large{background:linear-gradient(135deg,#2563eb,#3b82f6);color:white;padding:12px;border:none;border-radius:12px;font-weight:800;cursor:pointer}
+
+.keranjang-kosong{text-align:center;padding:40px;color:#9ca3af}
+
+@media screen and (max-width:768px){
+    .produk-grid-transaksi{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+}
